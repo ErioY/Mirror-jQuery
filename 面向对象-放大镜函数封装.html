@@ -1,0 +1,169 @@
+<!--
+ * @Autor: ErioY
+ * @Date: 2019-10-19 21:13:23
+ * @Email: 1973545559@qq.com
+ * @Github: https://github.com/ErioY
+ * @LastEditors: ErioY
+ * @LastEditTime: 2019-10-19 22:18:47
+ -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>面向对象-放大镜封装</title>
+    <style>
+    #box {
+        width: 500px;
+        height: 500px;
+        position: relative;
+        background-image: url("img/yang.jpg");
+        background-size: 500px 500px;
+    }
+    #box1 {
+        width: 400px;
+        height: 400px;
+        position: relative;
+        background-image: url("img/chong.jpg");
+        background-size: 400px 400px;
+    }
+    /* #mirrorBox {
+        width: 120px;
+        height: 90px;
+        background-color: red;
+        opacity: 0.3;
+        position: absolute;
+        top: 0;
+        left: 100px;
+    }
+    #showBox {
+        默认为三倍
+        width: 360px;
+        height: 270px;
+        position: absolute;
+        top: 0;
+        left: 550px;
+        background-image: url("img/chong.jpg");
+        background-size: 1500px 1500px;
+        background-position: -300px 0;
+    } */
+    </style>
+</head>
+<body>
+    <div id="box">
+        <!-- <div id="mirrorBox"></div>
+        <div id="showBox"></div> -->
+    </div>
+    <div id="box1"></div>
+</body>
+</html>
+<script src="jquery-3.2.1.min.js"></script>
+<script>
+class Mirror {
+    // 构造函数
+    constructor($boxDom, obj) {
+        let defaultObj = {
+            $morrorBox: null,
+            $showBox: null,
+            img: $boxDom.css("background-image"),
+
+            // 放大镜
+            width: 120,
+            height: 90,
+            color: "red",
+            opacity: 0.3,
+            // 放大倍数
+            multiple: 3
+        }
+        this.$boxDom = $boxDom;
+        // 判断用户是否自定义属性值
+        for (let key in defaultObj) {
+            this[key] = (obj[key] == undefined ? defaultObj[key] : obj[key]);
+        }
+        this.render();
+        this.addEvent();
+    }
+    // 分别创建放大镜和放大效果盒子以及样式
+    render() {
+        // 1. 放大镜
+        this.$mirrorBox = $("<div></div>");
+        this.$mirrorBox.css({
+            width: this.width + "px",
+            height: this.height + "px",
+            backgroundColor: this.color,
+            opacity: this.opacity,
+            position: "absolute",
+            display: "none"
+        });
+        this.$boxDom.append(this.$mirrorBox);
+        
+        // 2. 放大镜效果盒子
+        this.$showBox = $("<div></div>");
+        this.$showBox.css({
+            width: this.width * this.multiple + "px",
+            height: this.height * this.multiple + "px",
+            position: "absolute",
+            left: this.$boxDom.width() + 50,
+            top: 0,
+            "background-image": this.img,
+            "background-size": `${this.$boxDom.width() * this.multiple}px ${this.$boxDom.height() * this.multiple}px`,
+            display: "none"
+        });
+        this.$boxDom.append(this.$showBox);
+    }
+    // 事件处理函数
+    addEvent() {
+        this.$boxDom.mouseenter(() => {
+            this.$mirrorBox.show();
+            this.$showBox.show();
+        });
+        this.$boxDom.mouseleave(() => {
+            this.$mirrorBox.hide();
+            this.$showBox.hide();
+        });
+
+        let boxLeft = this.$boxDom.offset().left;
+        let boxTop = this.$boxDom.offset().top;
+
+        let boxWidth = this.$boxDom.width();
+        let boxHeight = this.$boxDom.height();
+
+        this.$boxDom.mousemove((event) => {
+            // 一、处理数据
+            // 1. 计算数据
+            let newLeft = event.pageX - boxLeft - this.width / 2;
+            let newTop = event.pageY - boxTop - this.height / 2;
+            // 2. 边界处理
+            if (newLeft < 0) {
+                newLeft = 0;
+            } else if (newLeft > boxWidth - this.width) {
+                newLeft = boxWidth - this.width;
+            }
+            if (newTop < 0) {
+                newTop = 0;
+            } else if (newTop > boxHeight - this.height) {
+                newTop = boxHeight - this.height;
+            }
+            // 二、处理外观
+            this.$mirrorBox.css({
+                left: newLeft,
+                top: newTop
+            });
+            this.$showBox.css({
+                "background-position": `-${newLeft * this.multiple}px -${newTop * this.multiple}px`
+            });
+        });
+    }
+}
+$(function() {
+    new Mirror($("#box"), {
+        color: "blue",
+        opacity: 0.5
+    });
+    new Mirror($("#box1"), {
+        multiple: 5,
+        opacity: 0.7
+    });
+});
+</script>

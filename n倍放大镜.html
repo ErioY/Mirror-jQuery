@@ -1,0 +1,88 @@
+<!--
+ * @Autor: ErioY
+ * @Date: 2019-10-19 20:17:09
+ * @Email: 1973545559@qq.com
+ * @Github: https://github.com/ErioY
+ * @LastEditors: ErioY
+ * @LastEditTime: 2019-10-19 21:12:26
+ -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>三倍放大镜效果</title>
+    <style>
+    #box {
+        width: 500px;
+        height: 500px;
+        position: relative;
+        background-image: url("img/chong.jpg");
+        background-size: 500px 500px;
+    }
+    #mirrorBox {
+        width: 120px;
+        height: 90px;
+        background-color: red;
+        opacity: 0.3;
+        position: absolute;
+        top: 0;
+        left: 100px;
+    }
+    #showBox {
+        /* 放大三倍 */
+        width: 360px;
+        height: 270px;
+        position: absolute;
+        top: 0;
+        left: 550px;
+        background-image: url("img/chong.jpg");
+        background-size: 1500px 1500px;
+        background-position: -300px 0;
+    }
+    </style>
+</head>
+<body>
+    <div id="box">
+        <div id="mirrorBox"></div>
+        <div id="showBox"></div>
+    </div>
+</body>
+</html>
+<script src="jquery-3.2.1.min.js"></script>
+<script>
+let boxLeft= $("#box").offset().left;
+let boxTop= $("#box").offset().top;
+
+let mirrorWidth = parseInt($("#mirrorBox").width());
+let mirrorHeight = parseInt($("#mirrorBox").height());
+
+let boxWidth = parseInt($("#box").width());
+let boxHeight = parseInt($("#box").height());
+$("#box").mousemove(function(event) {
+    // 一、数据处理
+    // 1. 计算数据: 计算镜子的left 、 top
+    let newLeft = event.pageX - boxLeft - mirrorWidth / 2;
+    let newTop = event.pageY - boxTop - mirrorHeight / 2;
+    // 2. 边界处理
+    if (newLeft < 0) {
+        newLeft = 0;
+    } else if (newLeft > boxWidth - mirrorWidth) {
+        newLeft = boxWidth - mirrorWidth;
+    }
+    if (newTop < 0) {
+        newTop = 0;
+    } else if (newTop > boxHeight - mirrorHeight) {
+        newTop = boxHeight - mirrorHeight;
+    }
+    // 二、外观处理
+    $("#mirrorBox").css({
+        left: newLeft,
+        top: newTop
+    });
+    $("#showBox").css({
+        "background-position": `-${newLeft*3}px -${newTop*3}px`
+    });
+});
+</script>
